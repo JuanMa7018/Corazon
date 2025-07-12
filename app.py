@@ -16,7 +16,7 @@ try:
     svc_model = joblib.load('best_svc_model.jb')
     scaler = joblib.load('minmax_scaler.jb') # Asegúrate de haber guardado el scaler también
 except FileNotFoundError:
-    st.error("Archivos de modelo o scaler no encontrados. Asegúrate de que 'best_svc_model.jb' y 'minmax_scaler.jbl' están presentes.")
+    st.error("Archivos de modelo o scaler no encontrados. Asegúrate de que 'best_svc_model.jb' y 'minmax_scaler.jb' están presentes.")
     st.stop()
 
 # Título de la aplicación

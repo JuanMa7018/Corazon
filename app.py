@@ -35,10 +35,10 @@ def predict_heart_problem(age, cholesterol):
 # Load images
 try:
     cabezote_image = 'cabezote.jpeg'
-    nosufre_image = 'nosufre.jpg'
-    sisufre_image = 'Sisure.jpg'
+    nosufre_image = 'nosufre.jpeg'
+    sisufre_image = 'sisufre.jpeg'
 except FileNotFoundError:
-    st.error("Image files not found. Please ensure 'cabezote.jpeg', 'nosufre.jpg', and 'Sisure.jpg' are in the same directory.")
+    st.error("Image files not found. Please ensure 'cabezote.jpeg', 'nosufre.jpeg', and 'sisufre.jpeg' are in the same directory.")
     cabezote_image = None
     nosufre_image = None
     sisufre_image = None

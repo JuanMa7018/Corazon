@@ -9,7 +9,7 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
 # Cargar el modelo y el scaler
-# Asegúrate de que los archivos 'svc_model.pkl' y 'scaler.pkl'
+# Asegúrate de que los archivos 'bert_svc_model.jb' y 'minmax_scaler.jb'
 # estén en el mismo directorio que este script o proporciona la ruta completa.
 # Si guardaste con .jb, cámbialo aquí
 try:

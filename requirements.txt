@@ -1,0 +1,4 @@
+streamlit
+jolib
+pandas
+pillow

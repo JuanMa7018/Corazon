@@ -6,85 +6,91 @@
 import streamlit as st
 import joblib
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
-import numpy as np
+import os
 
-# Cargar el modelo y el escalador
+# Load the trained model and scaler
 try:
     svc_model = joblib.load('best_svc_model.jb')
     scaler = joblib.load('minmax_scaler.jb')
 except FileNotFoundError:
-    st.error("Error: Los archivos del modelo (best_svc_model.jb) o del escalador (minmax_scaler.jb) no fueron encontrados.")
+    st.error("Error loading model or scaler. Make sure 'best_svc_model.jb' and 'minmax_scaler.jb' are in the same directory.")
     st.stop()
 
-# Título de la aplicación
+
+# Function to make predictions
+def predict_heart_problem(age, cholesterol):
+    # Create a DataFrame with the input data
+    input_data = pd.DataFrame({'edad': [age], 'colesterol': [cholesterol]})
+
+    # Scale the input data
+    scaled_input = scaler.transform(input_data)
+
+    # Make prediction
+    prediction = svc_model.predict(scaled_input)
+
+    return prediction[0]
+
+# --- Streamlit App ---
+
+# Load images
+try:
+    cabezote_image = 'cabezote.jpeg'
+    nosufre_image = 'nosufre.jpg'
+    sisufre_image = 'Sisure.jpg'
+except FileNotFoundError:
+    st.error("Image files not found. Please ensure 'cabezote.jpeg', 'nosufre.jpg', and 'Sisure.jpg' are in the same directory.")
+    cabezote_image = None
+    nosufre_image = None
+    sisufre_image = None
+
+
+# Add banner image
+if cabezote_image and os.path.exists(cabezote_image):
+    st.image(cabezote_image, use_column_width=True)
+else:
+    st.warning("Banner image not found.")
+
+
 st.title("Modelo IA para predicción de problemas cardiacos")
 
-# Imagen de banner (asegúrate de que cabezote.jpeg esté en la misma carpeta o especifica la ruta completa)
-try:
-    st.image("cabezote.jpeg", use_column_width=True)
-except FileNotFoundError:
-    st.warning("Advertencia: La imagen 'cabezote.jpeg' no fue encontrada. Asegúrate de que esté en la misma carpeta.")
-
-
-# Resumen del modelo para el usuario
 st.markdown("""
-Este modelo de Inteligencia Artificial utiliza técnicas de Machine Learning para predecir la probabilidad de que un paciente pueda sufrir problemas cardiacos basándose en su edad y nivel de colesterol.
-
-El modelo fue entrenado utilizando datos históricos de pacientes y un algoritmo llamado **Support Vector Machine (SVM)**. Antes de entrenar, los datos de edad y colesterol fueron ajustados usando un método de escalado para mejorar el rendimiento del modelo.
-
-Introduce la edad y el nivel de colesterol en el panel izquierdo para obtener una predicción.
+Este modelo de Inteligencia Artificial utiliza un clasificador de Máquinas de Vectores de Soporte (SVC)
+entrenado para predecir la probabilidad de sufrir problemas cardíacos basado en la edad y los niveles de colesterol.
+El modelo ha sido entrenado y validado para ofrecer una predicción informada.
 """)
 
-# Sidebar para la entrada de datos del usuario
-st.sidebar.header("Introduce los datos del paciente")
+# Sidebar for user input
+st.sidebar.header("Ingresa los datos del paciente")
 
-edad = st.sidebar.slider("Edad:", min_value=20, max_value=80, value=20, step=1)
-colesterol = st.sidebar.slider("Colesterol:", min_value=120, max_value=600, value=200, step=10)
+age = st.sidebar.slider("Edad:", min_value=20, max_value=80, value=20, step=1)
+cholesterol = st.sidebar.slider("Colesterol:", min_value=120, max_value=600, value=200, step=10)
 
-# Preparar los datos de entrada para el modelo
-data_input = pd.DataFrame({'edad': [edad], 'colesterol': [colesterol]})
+st.write("---")
 
-# Escalar los datos de entrada usando el scaler cargado
-try:
-    data_scaled = scaler.transform(data_input)
-    data_scaled_df = pd.DataFrame(data_scaled, columns=['edad', 'colesterol'])
+# Make prediction when button is clicked
+if st.button("Predecir"):
+    prediction = predict_heart_problem(age, cholesterol)
 
-    # Realizar la predicción
-    prediction = svc_model.predict(data_scaled_df)
+    st.header("Resultado de la Predicción")
 
-    # Mostrar los resultados
-    st.subheader("Resultado de la predicción:")
+    if prediction == 0:
+        st.markdown("<div style='background-color:#90EE90; padding: 10px; border-radius: 5px; color: black;'>", unsafe_allow_html=True)
+        st.markdown("<h3>0: ¡No sufrirá del corazón! 😊</h3>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+        if nosufre_image and os.path.exists(nosufre_image):
+            st.image(nosufre_image, use_column_width=True)
+        else:
+            st.warning("Image 'nosufre.jpg' not found.")
 
-    if prediction[0] == 0:
-        st.markdown(
-            f"""
-            <div style='background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px;'>
-                <p>✅ **0: No sufrirá del corazón**</p>
-            </div>
-            """, unsafe_allow_html=True
-        )
-        try:
-            st.image("nosufre.jpg", caption="¡Buenas noticias!", use_column_width=True)
-        except FileNotFoundError:
-            st.warning("Advertencia: La imagen 'nosufre.jpg' no fue encontrada.")
     else:
-        st.markdown(
-            f"""
-            <div style='background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px;'>
-                <p>😟 **1: Sufrirá del corazón**</p>
-            </div>
-            """, unsafe_allow_html=True
-        )
-        try:
-            st.image("Sisure.jpg", caption="Considera consultar a un médico.", use_column_width=True)
-        except FileNotFoundError:
-            st.warning("Advertencia: La imagen 'Sisure.jpg' no fue encontrada.")
+        st.markdown("<div style='background-color:#F08080; padding: 10px; border-radius: 5px; color: black;'>", unsafe_allow_html=True)
+        st.markdown("<h3>1: Posiblemente sufrirá del corazón 😞</h3>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+        if sisufre_image and os.path.exists(sisufre_image):
+            st.image(sisufre_image, use_column_width=True)
+        else:
+            st.warning("Image 'Sisure.jpg' not found.")
 
-except Exception as e:
-    st.error(f"Ocurrió un error durante el procesamiento de los datos o la predicción: {e}")
+st.write("---")
 
-
-# Información del elaborador
-st.markdown("---")
 st.markdown("Elaborado por: Alfredo Diaz © Unab 2025")

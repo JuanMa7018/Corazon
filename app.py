@@ -9,14 +9,14 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
 # Cargar el modelo y el scaler
-# Asegúrate de que los archivos 'bert_svc_model.jb' y 'minmax_scaler.jb'
+# Asegúrate de que los archivos 'best_svc_model.jb' y 'minmax_scaler.jb'
 # estén en el mismo directorio que este script o proporciona la ruta completa.
 # Si guardaste con .jb, cámbialo aquí
 try:
     svc_model = joblib.load('best_svc_model.jb')
     scaler = joblib.load('minmax_scaler.jb') # Asegúrate de haber guardado el scaler también
 except FileNotFoundError:
-    st.error("Archivos de modelo o scaler no encontrados. Asegúrate de que 'svc_model.pkl' y 'scaler.pkl' están presentes.")
+    st.error("Archivos de modelo o scaler no encontrados. Asegúrate de que 'best_svc_model.jb' y 'minmax_scaler.jbl' están presentes.")
     st.stop()
 
 # Título de la aplicación
